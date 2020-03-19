@@ -44,6 +44,7 @@ steps:
   displayName: 'Calculate and set pipeline variables for this job'
   inputs:
     targetType: inline
+    pwsh: true
     script: |
       
       $repoModelsDir = "$env:Build_SourcesDirectory\msgraph-sdk-php\src\Model\"
@@ -66,6 +67,7 @@ steps:
   displayName: 'Git: checkout dev'
   inputs:
     targetType: inline
+    pwsh: true
     workingDirectory: '$(Build.SourcesDirectory)/msgraph-sdk-php'
     script: |
       git checkout dev | Write-Host
@@ -84,6 +86,7 @@ steps:
   displayName: 'Git: set user config'
   inputs:
     targetType: inline
+    pwsh: true
     workingDirectory: '$(Build.SourcesDirectory)/msgraph-sdk-php'
     script: |
       git config user.email "GraphTooling@service.microsoft.com"
@@ -93,6 +96,7 @@ steps:
   displayName: 'Remove generated files from the repo'
   inputs:
     targetType: inline
+    pwsh: true
     script: |
       Remove-Item -Recurse $env:repoModelsDir | Write-Host
       Write-Host "Removed the existing generated files in the repo." -ForegroundColor Green
@@ -101,6 +105,7 @@ steps:
   displayName: 'Typewriter: generate v1.0 .NET files'
   inputs:
     targetType: filePath
+    pwsh: true
     filePath: '$(Build.SourcesDirectory)/msgraph-metadata/scripts/runTypewriter.ps1'
     arguments: '-verbosity Info -metadata $(cleanMetadata) -output $(outputPath) -generationMode Files -l PHP'
     workingDirectory: '$(Build.SourcesDirectory)' # Set the root for a multi-repo pipeline. /s
@@ -110,6 +115,7 @@ steps:
   displayName: 'Copy generated files into the repo'
   inputs:
     targetType: inline
+    pwsh: true
     script: |
       $modelsDirectory = Join-Path $env:outputPath "\com\microsoft\graph\model\"
       Move-Item $modelsDirectory $env:repoModelsDir
@@ -120,6 +126,7 @@ steps:
   inputs:
     targetType: inline
     workingDirectory: '$(Build.SourcesDirectory)/msgraph-sdk-php'
+    pwsh: true 
     script: |
       composer install # Adds dependencies to vendor.
       .\vendor\bin\phpunit --exclude-group functional
@@ -128,6 +135,7 @@ steps:
   displayName: 'Git: stage and commit generated files'
   inputs:
     targetType: inline
+    pwsh: true
     workingDirectory: '$(Build.SourcesDirectory)/msgraph-sdk-php'
     script: |
       Write-Host "About to add files....." -ForegroundColor Green
@@ -140,6 +148,7 @@ steps:
   displayName: 'Git: push updates'
   inputs:
     targetType: inline
+    pwsh: true
     workingDirectory: '$(Build.SourcesDirectory)/msgraph-sdk-php'
     script: |
       git push --set-upstream origin $env:branchName | Write-Host
